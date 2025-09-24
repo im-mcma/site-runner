@@ -1,11 +1,12 @@
 # -------------------------------
 # Dockerfile ساده و خودکار ZaneOps
 # منطقه زمانی: Asia/Tehran
+# پورت داشبورد: 10000
 # -------------------------------
 
 FROM ubuntu:22.04
 
-# تنظیم محیط غیر تعاملی برای نصب بسته‌ها
+# تنظیم محیط غیر تعاملی
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Tehran
 
@@ -21,16 +22,17 @@ RUN apt-get update && apt-get install -y \
     sudo \
     && rm -rf /var/lib/apt/lists/*
 
-# ایجاد کاربر برای ZaneOps
+# اجرای اسکریپت نصب ZaneOps با root
+RUN curl -fsSL https://cdn.zaneops.dev/install.sh | bash
+
+# ایجاد کاربر معمولی برای امنیت
 RUN useradd -m zaneops && echo "zaneops ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
+# سوئیچ به کاربر معمولی
 USER zaneops
 WORKDIR /home/zaneops
 
-# دانلود و نصب ZaneOps (اسکریپت رسمی)
-RUN curl -fsSL https://cdn.zaneops.dev/install.sh | bash
-
-# باز کردن پورت داشبورد وب
+# باز کردن پورت 10000 برای داشبورد وب
 EXPOSE 10000
 
 # دستور شروع کانتینر
