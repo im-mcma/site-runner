@@ -1,5 +1,13 @@
-# مرحله اول: پایه
+# -------------------------------
+# Dockerfile ساده و خودکار ZaneOps
+# منطقه زمانی: Asia/Tehran
+# -------------------------------
+
 FROM ubuntu:22.04
+
+# تنظیم محیط غیر تعاملی برای نصب بسته‌ها
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Tehran
 
 # نصب پیش‌نیازها
 RUN apt-get update && apt-get install -y \
@@ -8,19 +16,22 @@ RUN apt-get update && apt-get install -y \
     docker.io \
     docker-compose \
     postgresql \
+    postgresql-client \
+    tzdata \
+    sudo \
     && rm -rf /var/lib/apt/lists/*
 
-# اضافه کردن کاربر
-RUN useradd -m zaneops
+# ایجاد کاربر برای ZaneOps
+RUN useradd -m zaneops && echo "zaneops ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 USER zaneops
 WORKDIR /home/zaneops
 
-# دانلود و نصب ZaneOps
+# دانلود و نصب ZaneOps (اسکریپت رسمی)
 RUN curl -fsSL https://cdn.zaneops.dev/install.sh | bash
 
-# در صورت نیاز پورت‌ها را باز کنید
+# باز کردن پورت داشبورد وب
 EXPOSE 10000
 
-# دستور اجرا
+# دستور شروع کانتینر
 CMD ["zaneops"]
